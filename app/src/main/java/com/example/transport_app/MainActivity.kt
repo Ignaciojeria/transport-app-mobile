@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.transport_app.ui.auth.AuthenticationScreen
+import com.example.transport_app.ui.navigation.AppNavGraph
 import com.example.transport_app.ui.theme.TransportappTheme
 
 class MainActivity : ComponentActivity() {
@@ -21,7 +21,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    AuthenticationScreen()
+                    AppNavGraph() // Llamamos al NavGraph en vez de una pantalla específica
                 }
             }
         }

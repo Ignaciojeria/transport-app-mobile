@@ -49,9 +49,19 @@ dependencies {
     implementation("io.ktor:ktor-client-content-negotiation:$ktor_version")
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.0")
-    implementation("androidx.compose.material3:material3:1.3.1")
-    implementation("androidx.compose.material3:material3-window-size-class:1.3.1")
-    implementation("androidx.compose.material3:material3-adaptive-navigation-suite:1.4.0-alpha04")
+    val materialVersion = "1.4.0-alpha04" // La versión alpha más reciente
+    // Material Icons
+    implementation("androidx.compose.material:material-icons-core:$materialVersion")
+    implementation("androidx.compose.material:material-icons-extended:$materialVersion")
+    // Material 3
+    implementation("androidx.compose.material3:material3:$materialVersion")
+    implementation("androidx.compose.material3:material3-window-size-class:$materialVersion")
+    implementation("androidx.compose.material3:material3-adaptive-navigation-suite:$materialVersion")
+    val coilVersion = "3.1.0" // La versión alpha más reciente
+    //Coil
+    implementation("io.coil-kt.coil3:coil-compose:$coilVersion")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:$coilVersion")
+    implementation("io.coil-kt.coil3:coil-svg:$coilVersion")
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
