@@ -16,24 +16,30 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import coil3.ImageLoader
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.svg.SvgDecoder
+import com.example.transport_app.ui.viewmodel.CreateOrganizationViewModel
+import com.example.transport_app.ui.viewmodel.RegisterViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CreateOrganizationScreen(
-    onCreateClick: (String, String) -> Unit = { _, _ -> }
+    registerViewModel: RegisterViewModel,
+    createOrganizationViewModel: CreateOrganizationViewModel = viewModel(),
+    onSuccess: () -> Unit = {}
 ) {
-    var organizationName by remember { mutableStateOf("") }
+    val registeredEmail by registerViewModel.registeredEmail.collectAsState()
+    val organizationResponse by createOrganizationViewModel.organizationResponse.collectAsState()
 
-    // Dropdown de países
+    var organizationName by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
     var selectedCountry by remember { mutableStateOf("") }
     val countries = listOf("Colombia", "México", "Argentina", "Chile", "Perú", "Ecuador", "Venezuela", "Brasil")
 
-    // Configuración del ImageLoader para SVG
     val context = LocalContext.current
     val imageLoader = remember {
         ImageLoader.Builder(context)
@@ -41,7 +47,25 @@ fun CreateOrganizationScreen(
             .build()
     }
 
-    Scaffold { paddingValues ->
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(organizationResponse) {
+        organizationResponse?.let { response ->
+            if (response.organizationKey.isNotEmpty()) {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar("Organización creada con éxito")
+                }
+                onSuccess()
+            } else {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(response.message)
+                }
+            }
+        }
+    }
+
+    Scaffold(snackbarHost = { SnackbarHost(snackbarHostState) }) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -134,13 +158,21 @@ fun CreateOrganizationScreen(
 
             // Botón para crear la organización
             Button(
-                onClick = { onCreateClick(organizationName, selectedCountry) },
+                onClick = {
+                    registeredEmail?.let { email ->
+                        createOrganizationViewModel.createOrganization(
+                            name = organizationName,
+                            country = selectedCountry,
+                            email = email
+                        )
+                    }
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
                 shape = RoundedCornerShape(28.dp),
                 colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF5138EE)),
-                enabled = organizationName.isNotEmpty() && selectedCountry.isNotEmpty()
+                enabled = organizationName.isNotEmpty() && selectedCountry.isNotEmpty() && registeredEmail != null
             ) {
                 Text(
                     text = "Crear Organización",

@@ -28,6 +28,7 @@ fun RegisterScreen(
     onRegisterSuccess: () -> Unit = {}
 ) {
     val registerResponse by viewModel.registerResponse.collectAsState()
+    val registeredEmail by viewModel.registeredEmail.collectAsState() // ✅ Corrección aquí
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
     var isLoading by remember { mutableStateOf(false) }
@@ -42,11 +43,12 @@ fun RegisterScreen(
     var passwordError by remember { mutableStateOf<String?>(null) }
     var confirmPasswordError by remember { mutableStateOf<String?>(null) }
 
-    // Handle registration response
+    // ✅ Manejo del registro en LaunchedEffect sin @Composable error
     LaunchedEffect(registerResponse) {
         registerResponse?.let { response ->
             isLoading = false
             if (!response.message.startsWith("Error:", ignoreCase = true)) {
+                println("Email registrado almacenado: $registeredEmail") // ✅ Debug
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar("Registro exitoso")
                 }
@@ -69,7 +71,7 @@ fun RegisterScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "Registrate con tu usuario y contraseña o ingresa utilizando tu cuenta de google",
+                text = "Regístrate con tu usuario y contraseña o ingresa utilizando tu cuenta de Google",
                 fontSize = 16.sp,
                 color = Color.Gray,
                 textAlign = TextAlign.Center
@@ -107,56 +109,21 @@ fun RegisterScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 isError = passwordError != null,
                 supportingText = { passwordError?.let { Text(it, color = Color.Red) } },
-                trailingIcon = {
-                    TextButton(
-                        onClick = { passwordVisible = !passwordVisible },
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Text(
-                            text = if (passwordVisible) "Ocultar" else "Mostrar",
-                            fontSize = 11.sp,
-                            color = Color(0xFF5138EE)
-                        )
-                    }
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.LightGray,
-                    focusedBorderColor = Color(0xFF5138EE),
-                    errorBorderColor = Color.Red
-                )
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             // Confirm Password field
-            var confirmPasswordVisible by remember { mutableStateOf(false) }
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = { confirmPassword = it; confirmPasswordError = null },
                 label = { Text("Confirmar Contraseña") },
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
-                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 isError = confirmPasswordError != null,
                 supportingText = { confirmPasswordError?.let { Text(it, color = Color.Red) } },
-                trailingIcon = {
-                    TextButton(
-                        onClick = { confirmPasswordVisible = !confirmPasswordVisible },
-                        modifier = Modifier.padding(end = 8.dp)
-                    ) {
-                        Text(
-                            text = if (confirmPasswordVisible) "Ocultar" else "Mostrar",
-                            fontSize = 11.sp,
-                            color = Color(0xFF5138EE)
-                        )
-                    }
-                },
-                colors = OutlinedTextFieldDefaults.colors(
-                    unfocusedBorderColor = Color.LightGray,
-                    focusedBorderColor = Color(0xFF5138EE),
-                    errorBorderColor = Color.Red
-                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -164,7 +131,6 @@ fun RegisterScreen(
             // Register button
             Button(
                 onClick = {
-                    // Validate fields
                     val isValid = validateFields(
                         email, password, confirmPassword,
                         onEmailError = { emailError = it },
@@ -193,50 +159,6 @@ fun RegisterScreen(
                     Text("Crear Cuenta", fontSize = 18.sp)
                 }
             }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Or continue with
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "O inicia sesión con",
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center,
-                    color = Color.Gray
-                )
-            }
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Google login button
-            Button(
-                onClick = { /* TODO: Handle Google login */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = RoundedCornerShape(28.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.White,
-                    contentColor = Color.Black
-                )
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "G",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(end = 8.dp)
-                    )
-                    Spacer(modifier = Modifier.size(8.dp))
-                    Text("Continue with Google", fontSize = 16.sp)
-                }
-            }
         }
     }
 }
@@ -251,7 +173,7 @@ private fun validateFields(
 ): Boolean {
     var isValid = true
 
-    // Email validation
+    // Validación de Email
     if (email.isBlank()) {
         onEmailError("El email es requerido")
         isValid = false
@@ -260,7 +182,7 @@ private fun validateFields(
         isValid = false
     }
 
-    // Password validation
+    // Validación de Contraseña
     if (password.isBlank()) {
         onPasswordError("La contraseña es requerida")
         isValid = false
@@ -269,7 +191,7 @@ private fun validateFields(
         isValid = false
     }
 
-    // Confirm password validation
+    // Validación de Confirmación de Contraseña
     if (confirmPassword.isBlank()) {
         onConfirmPasswordError("La confirmación de contraseña es requerida")
         isValid = false

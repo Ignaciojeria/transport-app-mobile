@@ -9,9 +9,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import com.example.transport_app.ui.viewmodel.RegisterViewModel
 
 @Composable
-fun AuthenticationScreen(navController: NavController) {
+fun AuthenticationScreen(navController: NavController,
+                         registerViewModel: RegisterViewModel) {
     var selectedTabIndex by remember { mutableStateOf(0) }
     val tabs = listOf("Entrar", "Registrate")
 
@@ -78,9 +80,10 @@ fun AuthenticationScreen(navController: NavController) {
         when (selectedTabIndex) {
             0 -> LoginScreen()
             1 -> RegisterScreen(
+                viewModel = registerViewModel,
                 onRegisterSuccess = {
                     navController.navigate("createOrganization") {
-                        popUpTo("authentication") { inclusive = true } // Elimina la vista de autenticación del stack
+                        popUpTo("authentication") { inclusive = true }
                     }
                 }
             )
