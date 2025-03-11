@@ -74,7 +74,7 @@ fun AuthenticationScreen(navController: NavController,
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(16.dp))
 
         // Content based on selected tab
         when (selectedTabIndex) {

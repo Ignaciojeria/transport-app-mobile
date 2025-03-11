@@ -126,6 +126,7 @@ fun LoginScreen() {
     Spacer(modifier = Modifier.height(24.dp))
 
     // Or continue with
+    /*
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -151,7 +152,9 @@ fun LoginScreen() {
             containerColor = Color.White,
             contentColor = Color.Black
         )
-    ) {
+    )
+
+    {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center
@@ -170,5 +173,5 @@ fun LoginScreen() {
                 fontSize = 16.sp
             )
         }
-    }
+    }*/
 }
